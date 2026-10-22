@@ -1,12 +1,60 @@
-def esta_duplicado(inventario, nombre):
+def buscar_herramienta_inventario(inventario, nombre):
 
-    duplicado = False
+    posicion = 0
     for articulo in inventario:
         if articulo['herramienta'] == nombre:
-            duplicado = True
-            break
+            return posicion
+        posicion += 1
+    return -1
 
-    return duplicado
+def actualizar_stock(inventario):
+    print("************************************************")
+    print("\tACTUALIZAR STOCK DEL INVENTARIO")
+    print("************************************************")
+
+    if len(inventario) == 0:
+        print("EL INVENTARIO ESTÁ VACÍO. NO HAY HERRAMIENTAS PARA MODIFICAR.")
+        print("PRESIONE ENTER PARA CONTINUAR")
+        input()
+        return
+
+    nombre_buscado = input("INGRESE NOMBRE DE LA HERRAMIENTA: ").strip().upper()
+    if len(nombre_buscado) == 0:
+        raise ValueError("EL NOMBRE NO PUEDE ESTAR VACIO")
+
+    indice = buscar_herramienta_inventario(inventario, nombre_buscado)
+    if indice == -1:
+        print("LA HERRAMIENTA NO EXISTE EN EL CATALOGO")
+        print("INGRESE ENTER PARA CONTINUAR")
+        input()
+        return
+
+    print("\t1. VENTA\n\t2. INGRESO DE MERCADERIA")
+    opcion = input("INGRESE LA OPCION DESEADA (1-2): ").strip()
+
+    if(opcion != "1" and opcion != "2"):
+        print("OPCION INCORRECTA. VOLVIENDO AL MENU PRINCIPAL")
+        print("INGRESE ENTER PARA CONTINUAR")
+        input()
+        return
+
+    unidades = int(input("INGRESE LA CANTIDAD DE LA OPCION: "))
+    if unidades <= 0:
+        raise ValueError("LA CANTIDAD DEBE SER MAYOR 0")
+    
+    if opcion == "1":
+        if unidades > inventario[indice]['cantidad']:
+            raise ValueError("LA VENTA SUPERA EL STOCK DISPONIBLE")
+        
+        inventario[indice]['cantidad'] -= unidades
+        print("VENTA REGISTRADA CON EXITO")
+
+    else:
+        inventario[indice]['cantidad'] += unidades
+        print("INGRESO DE MERCADERIA REGISTRADO CON EXITO")
+    
+    print("PRESIONE ENTER PARA CONTINUAR")
+    input()
 
 def registrar_producto(inventario):
 
@@ -14,16 +62,16 @@ def registrar_producto(inventario):
     print("\tDAR DE ALTA UN PRODUCTO NUEVO")
     print("************************************************")
 
-    nombre = input("INGRESE EL NOMBRE DE LA ERRAMIENTA: ").strip().upper()
+    nombre = input("INGRESE EL NOMBRE DE LA HERRAMIENTA: ").strip().upper()
 
     if len(nombre) == 0:
         raise ValueError("ENTRADA INVÁLIDA. EL NOMBRE NO PUEDE ESTAR VACIO")
     else:
-        duplicado = esta_duplicado(inventario, nombre)
-        if duplicado:
+        duplicado = buscar_herramienta_inventario(inventario, nombre)
+        if duplicado > -1:
             raise ValueError("ARTICULO YA REGISTRADO, INTENTE NUEVAMENTE")
         else:
-            stock = int(input("INGRESE EL STOCK DEL PRODUCTO"))
+            stock = int(input("INGRESE EL STOCK DEL PRODUCTO: "))
 
             if stock < 0:
                 raise ValueError("EL STOCK NO PUEDE SER NEGATIVO")
@@ -74,33 +122,25 @@ def consultar_stock(inventario):
         return
 
     else:
-        try:
+        nombre_buscado = input("INGRESE NOMBRE DE LA HERRAMIENTA PARA SABER STOCK: ").strip().upper()
 
-            nombre_buscado = input("INGRESE NOMBRE DE LA HERRAMIENTA PARA SABER STOCK: ").strip().upper()
-
-            if len(nombre_buscado) == 0:
-                raise ValueError("EL NOMBRE NO PUEDE ESTAR VACÍO")
-            else:
-                encontrado = False
-                for articulo in inventario:
-                    if nombre_buscado == articulo['herramienta']:
-                        print("ARTÍCULO ENCONTRADO")
-                        print(f"HERRAMIENTA: {articulo['herramienta']} | STOCK: {articulo['cantidad']}")
-                        encontrado = True
-                        print("INGRESE ENTER PARA CONTINUAR")
-                        input()
-                        break
-
-                if not encontrado:
-                    print("EL ARTICULO BUSCADO NO EXISTE EN EL INVENTARIO")
+        if len(nombre_buscado) == 0:
+            raise ValueError("EL NOMBRE NO PUEDE ESTAR VACÍO")
+        else:
+            encontrado = False
+            for articulo in inventario:
+                if nombre_buscado == articulo['herramienta']:
+                    print("ARTÍCULO ENCONTRADO")
+                    print(f"HERRAMIENTA: {articulo['herramienta']} | STOCK: {articulo['cantidad']}")
+                    encontrado = True
                     print("INGRESE ENTER PARA CONTINUAR")
                     input()
+                    break
 
-        except ValueError as e:
-            print("ENTRADA INVÁLIDA, INTÉNTELO NUEVAMENTE")
-            print(f"Error {e}")
-            input()
-            return
+            if not encontrado:
+                print("EL ARTICULO BUSCADO NO EXISTE EN EL INVENTARIO")
+                print("INGRESE ENTER PARA CONTINUAR")
+                input()
 
 def mostrar_inventario(inventario):
 
@@ -150,9 +190,9 @@ def cargar_herramientas(inventario):
                 if nombre == "":
                     raise ValueError("EL NOMBRE NO PUEDE ESTAR VACIO")
                 
-                duplicado = esta_duplicado(inventario, nombre)
+                duplicado = buscar_herramienta_inventario(inventario, nombre)
 
-                if duplicado:
+                if duplicado > -1:
                     raise ValueError("ARTÍCULO YA REGISTRADO, INTENTE NUEVAMENTE")
                 break
             except ValueError as e:
@@ -172,11 +212,7 @@ def cargar_herramientas(inventario):
                 print(f"ERROR {e}")
                 input()
 
-        nueva_herramienta = {
-            'herramienta': nombre,
-            'cantidad': stock
-        }
-        inventario.append(nueva_herramienta)
+        inventario.append({'herramienta': nombre, 'cantidad': stock})
         print(f"{nombre} REGISTRADO CON ÉXITO")
 
     print("PRESIONE ENTER PARA CONTINUAR")
@@ -214,7 +250,12 @@ def main():
             elif opcion == 2:
                 mostrar_inventario(inventario)
             elif opcion == 3:
-                consultar_stock(inventario)
+                try:
+                    consultar_stock(inventario)
+                except ValueError as e:
+                    print("ENTRADA INVÁLIDA, INTENTE NUEVAMENTE")
+                    print(f"ERROR: {e}")
+                    input()
             elif opcion == 4:
                 consultar_agotados(inventario)
             elif opcion == 5:
@@ -230,7 +271,12 @@ def main():
                     input()
 
             elif opcion == 6:
-                pass
+                try:
+                    actualizar_stock(inventario)
+                except ValueError as e:
+                    print("ENTRADA INVÁLIDA, INTENTE NUEVAMENTE")
+                    print(f"ERROR: {e}")
+                    input()
             elif opcion == 7:
                 break
             else:
