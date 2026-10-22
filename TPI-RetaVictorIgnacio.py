@@ -1,3 +1,35 @@
+def esta_duplicado(inventario, nombre):
+
+    duplicado = False
+    for articulo in inventario:
+        if articulo['herramienta'] == nombre:
+            duplicado = True
+            break
+
+    return duplicado
+
+def registrar_producto(inventario):
+
+    print("************************************************")
+    print("\tDAR DE ALTA UN PRODUCTO NUEVO")
+    print("************************************************")
+
+    nombre = input("INGRESE EL NOMBRE DE LA ERRAMIENTA: ").strip().upper()
+
+    if len(nombre) == 0:
+        raise ValueError("ENTRADA INVÁLIDA. EL NOMBRE NO PUEDE ESTAR VACIO")
+    else:
+        duplicado = esta_duplicado(inventario, nombre)
+        if duplicado:
+            raise ValueError("ARTICULO YA REGISTRADO, INTENTE NUEVAMENTE")
+        else:
+            stock = int(input("INGRESE EL STOCK DEL PRODUCTO"))
+
+            if stock < 0:
+                raise ValueError("EL STOCK NO PUEDE SER NEGATIVO")
+            else:
+                inventario.append({'herramienta': nombre, 'cantidad': stock})
+
 def consultar_agotados(inventario):
 
     print("************************************************")
@@ -111,14 +143,15 @@ def cargar_herramientas(inventario):
         while True:
             try:
                 nombre = input("INGRESE NOMBRE DE LA HERRAMIENTA: ").strip().upper()
+                if nombre == "SALIR":
+                            print("CARGA INTERRUMPIDA. VOLVIENDO AL MENÚ")
+                            input()
+                            return
                 if nombre == "":
                     raise ValueError("EL NOMBRE NO PUEDE ESTAR VACIO")
                 
-                duplicado = False
-                for articulo in inventario:
-                    if articulo['herramienta'] == nombre:
-                        duplicado = True
-                
+                duplicado = esta_duplicado(inventario, nombre)
+
                 if duplicado:
                     raise ValueError("ARTÍCULO YA REGISTRADO, INTENTE NUEVAMENTE")
                 break
@@ -126,22 +159,17 @@ def cargar_herramientas(inventario):
                 print("ENTRADA INVÁLIDA, INTENTE NUEVAMENTE")
                 print(f"Error {e}")
                 input()
-        
-        if nombre == "SALIR":
-            print("CARGA INTERRUMPIDA. VOLVIENDO AL MENÚ")
-            input()
-            return
 
         while True:
             try:
                 stock = input("INGRESE EL STOCK DEL PRODUCTO: ")
                 stock = int(stock)
                 if stock < 0:
-                    raise ValueError("LA CANTIDAD DEBE SER MAYOR A 0")
+                    raise ValueError("LA CANTIDAD DEBE SER MAYOR O IGUAL A 0")
                 break
             except ValueError as e:
                 print("ENTRADA INVÁLIDA, INTENTE NUEVAMENTE")
-                print(f"error {e}")
+                print(f"ERROR {e}")
                 input()
 
         nueva_herramienta = {
@@ -153,8 +181,6 @@ def cargar_herramientas(inventario):
 
     print("PRESIONE ENTER PARA CONTINUAR")
     input()
-
-
 
 def imprimir_menu():
 
@@ -171,7 +197,6 @@ def imprimir_menu():
     print("=====================================")
 
 def main():
-
     inventario = []
 
     while True:
@@ -193,7 +218,17 @@ def main():
             elif opcion == 4:
                 consultar_agotados(inventario)
             elif opcion == 5:
-                pass
+                try:
+                    registrar_producto(inventario)
+                    print("PRODUCTO CARGADO CON ÉXITO")
+                    print("PRESIONE ENTER PARA CONTINUAR")
+                    input()
+
+                except ValueError as e:
+                    print("ENTRADA INVÁLIDA, INTENTE NUEVAMENTE")
+                    print(f"ERROR: {e}")
+                    input()
+
             elif opcion == 6:
                 pass
             elif opcion == 7:
@@ -206,5 +241,4 @@ def main():
             print(f"Error: {e}")
             input()         #La función de este input es para pausar la ejecución sin
                             #tener que llamar a os.system("pause"), ya que es un comando muy pesado
-
 main()
