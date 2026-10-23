@@ -1,5 +1,12 @@
-def buscar_herramienta_inventario(inventario, nombre):
-
+def buscar_herramienta_inventario(inventario: list, nombre: str)-> int:
+    """
+    Busca una herramienta en el inventario por su nombre.
+    Args:
+        inventario (list): Lista de diccionarios del inventario.
+        nombre (str): Nombre de la herramienta a buscar.
+    Returns:
+        int: Índice de la herramienta en la lista, o -1 si no existe.
+    """
     posicion = 0
     for articulo in inventario:
         if articulo['herramienta'] == nombre:
@@ -7,7 +14,15 @@ def buscar_herramienta_inventario(inventario, nombre):
         posicion += 1
     return -1
 
-def actualizar_stock(inventario):
+def actualizar_stock(inventario: list) -> None:
+    """
+    Gestiona la actualización de stock (venta o ingreso) de una herramienta.
+    Args:
+        inventario (list): Lista de diccionarios del inventario.
+    Raises:
+        ValueError: Si el nombre está vacío, las unidades son menores o iguales a cero,
+                    o si una venta supera el stock disponible.
+    """
     print("************************************************")
     print("\tACTUALIZAR STOCK DEL INVENTARIO")
     print("************************************************")
@@ -56,8 +71,15 @@ def actualizar_stock(inventario):
     print("PRESIONE ENTER PARA CONTINUAR")
     input()
 
-def registrar_producto(inventario):
-
+def registrar_producto(inventario: list)-> None:
+    """
+    Registra una nueva herramienta en el inventario con su stock inicial.
+    Args:
+        inventario (list): Lista de diccionarios del inventario.
+    Raises:
+        ValueError: Si el nombre está vacío, el artículo ya existe, 
+                    o el stock ingresado es negativo.
+    """
     print("************************************************")
     print("\tDAR DE ALTA UN PRODUCTO NUEVO")
     print("************************************************")
@@ -78,8 +100,12 @@ def registrar_producto(inventario):
             else:
                 inventario.append({'herramienta': nombre, 'cantidad': stock})
 
-def consultar_agotados(inventario):
-
+def consultar_agotados(inventario: list)-> None:
+    """
+    Muestra en pantalla las herramientas del inventario que tienen stock igual a cero.
+    Args:
+        inventario (list): Lista de diccionarios del inventario.
+    """
     print("************************************************")
     print("\tREPORTE DE AGOTADOS")
     print("************************************************")
@@ -108,8 +134,14 @@ def consultar_agotados(inventario):
         print("INGRESE ENTER PARA CONTINUAR")
         input()
 
-def consultar_stock(inventario):
-
+def consultar_stock(inventario: list)-> None:
+    """
+    Busca una herramienta específica y muestra su cantidad de stock disponible.
+    Args:
+        inventario (list): Lista de diccionarios del inventario.
+    Raises:
+        ValueError: Si el nombre ingresado por el usuario está vacío.
+    """
     print("************************************************")
     print("\tCONSULTAR STOCK DE UNA HERRAMIENTA")
     print("************************************************")
@@ -142,8 +174,12 @@ def consultar_stock(inventario):
                 print("INGRESE ENTER PARA CONTINUAR")
                 input()
 
-def mostrar_inventario(inventario):
-
+def mostrar_inventario(inventario: list)-> None:
+    """
+    Imprime en pantalla la lista completa de herramientas y sus existencias.
+    Args:
+        inventario (list): Lista de diccionarios del inventario.
+    """
     print("************************************************")
     print("\tMUESTRA EL INVENTARIO ACTUAL")
     print("************************************************")
@@ -159,8 +195,12 @@ def mostrar_inventario(inventario):
     print("INGRESE ENTER PARA CONTINUAR")
     input()
 
-def cargar_herramientas(inventario):
-
+def cargar_herramientas(inventario: list) -> None:
+    """
+    Permite realizar la carga masiva e iterativa de múltiples herramientas en el inventario.
+    Args:
+        inventario (list): Lista de diccionarios del inventario.
+    """
     print("************************************************")
     print("\tCARGA DE HERRAMIENTAS\t")
     print("************************************************")
@@ -218,8 +258,10 @@ def cargar_herramientas(inventario):
     print("PRESIONE ENTER PARA CONTINUAR")
     input()
 
-def imprimir_menu():
-
+def imprimir_menu()-> None:
+    """
+    Imprime en la terminal las opciones disponibles del menú interactivo.
+    """
     print("=====================================")
     print("SELECCIONE UNA OPCION PARA CONTINUAR")
     print("=====================================")
@@ -232,7 +274,13 @@ def imprimir_menu():
     print("OPCION [7]: SALIR")
     print("=====================================")
 
-def main():
+def main() -> None:
+    """
+    Bloque principal que inicializa el inventario y controla el ciclo del menú interactivo.
+
+    Maneja la redirección de las opciones seleccionadas y centraliza la captura 
+    de excepciones (ValueError) enviadas por las funciones del sistema.
+    """
     inventario = []
 
     while True:
